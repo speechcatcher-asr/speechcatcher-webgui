@@ -1,0 +1,34 @@
+{
+  "name": "speechcatcher-webgui",
+  "version": "1.0.0",
+  "description": "A webgui for video and audio transcription",
+  "main": "js/speechcatcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/speechcatcher-asr/speechcatcher-webgui.git"
+  },
+  "keywords": [
+    "webgui",
+    "transcription",
+    "automatic",
+    "subtitling",
+    "automatic",
+    "speech",
+    "recognition",
+    "ASR"
+  ],
+  "author": "Benjamin Milde",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/speechcatcher-asr/speechcatcher-webgui/issues"
+  },
+  "homepage": "https://github.com/speechcatcher-asr/speechcatcher-webgui#readme",
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "bootstrap": "^5.2.2",
+    "feather": "0.0.6"
+  }
+}
