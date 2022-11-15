@@ -3,14 +3,14 @@ import shutil
 
 # Worker process that spawns processes to transcript the media file
 # Starts the engine and redirects output to a temp file (logging)
-def process_job(filename, tmp_output_log_dir, speechengine='whisper',
+def process_job(filename, tmp_output_log_dir, speechengine='whisper', params='--model small'
                 cuda_ld_library_path='LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib/',
                 cuda_wrapper='CUDA_VISIBLE_DEVICES=0'):
 
     if speechengine == 'whisper':
         engine_full_command = shutil.which('whisper')
 
-        job_command = f'{cuda_ld_library_path} {cuda_wrapper} {engine_full_command} {filename}'
+        job_command = f'{cuda_ld_library_path} {cuda_wrapper} {engine_full_command} {params} {filename}'
 
         print('Starting job:', job_command)
         proc = subprocess.Popen(job_command,

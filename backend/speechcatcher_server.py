@@ -20,6 +20,8 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['CUDA_WRAPPER'] = 'CUDA_VISIBLE_DEVICES=0'
 app.config['CUDA_LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib/'
+app.config['SPEECHENGINE'] = 'whisper'
+app.config['SPEECHENGINE_PARAMS'] = '--model small'
 
 # only for development
 app.secret_key = 'secretkey'
@@ -49,7 +51,8 @@ def process_file():
 
         # Queue a job for the uploaded file with a backend/asr_worker.py worker
         speechcatcher_queue.enqueue('backend.asr_worker.process_job', args=(full_filename, tmp_output_log_dir,
-                                                                            'whisper',
+                                                                            app.config['SPEECHENGINE'], 
+                                                                            app.config['SPEECHENGINE_PARAMS'],
                                                                             app.config['CUDA_LD_LIBRARY_PATH'],
                                                                             app.config['CUDA_WRAPPER']))
 
