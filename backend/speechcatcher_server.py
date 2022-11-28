@@ -11,6 +11,7 @@ import tempfile
 from redis import Redis
 from rq import Queue
 from rq.registry import StartedJobRegistry
+from rq.job import Job
 
 redis_conn = Redis()
 speechcatcher_queue = Queue(connection=redis_conn)
