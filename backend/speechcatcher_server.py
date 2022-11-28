@@ -57,7 +57,8 @@ def process_file():
         tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
         # Queue a job for the uploaded file with a backend/asr_worker.py worker
-        speechcatcher_queue.enqueue('asr_worker.process_job', args=(full_filename, tmp_output_log_dir,
+        # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
+        speechcatcher_queue.enqueue('asr_worker.process_job', timeout=360000, args=(full_filename, tmp_output_log_dir,
                                                                             app.config['SPEECHENGINE'], 
                                                                             app.config['SPEECHENGINE_PARAMS'],
                                                                             app.config['CUDA_LD_LIBRARY_PATH'],
@@ -65,28 +66,32 @@ def process_file():
 
         return '<p>File uploaded.</p>'
 
+# Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
     return {'description':job.description, 'status':job.get_status, 'enqueued_at':job.enqueued_at,
             'started_at':job.started_at, 'ended_at':job.ended_at}
 
+# List the status of all running, queued and expired jobs as json
 @app.route('/status', methods=['GET'])
 def status():
     running_job_ids = registry.get_job_ids() 
     expired_job_ids = registry.get_expired_job_ids() 
     queued_job_ids = registry.get_queue().job_ids
 
-    running_jobs = Job.fetch_many(running_job_ids, connection=redis)
+    running_jobs = Job.fetch_many(running_job_ids, connection=redis_conn)
     running_job_dicts = [get_job_status_dict(job) for job in running_jobs]
 
-    expired_jobs = Job.fetch_many(expired_job_ids, connection=redis)
+    expired_jobs = Job.fetch_many(expired_job_ids, connection=redis_conn)
     expired_job_dicts = [get_job_status_dict(job) for job in expired_jobs]
 
-    queued_jobs = Job.fetch_many(queued_job_ids, connection=redis)
+    queued_jobs = Job.fetch_many(queued_job_ids, connection=redis_conn)
     queued_job_dicts = [get_job_status_dict(job) for job in queued_jobs]
 
     return jsonify({'running': running_job_dicts, 'expired': expired_job_dicts,
                      'queued': queued_job_dicts})
 
+# List available and finished transcriptions that the user can download
+# We let the speechengine write to all formats (srt, txt, vtt)
 @app.route('/list_outputs', methods=['GET'])
 def list_outputs():
     folder_len = len(app.config['UPLOAD_FOLDER'])
