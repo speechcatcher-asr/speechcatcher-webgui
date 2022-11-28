@@ -56,7 +56,7 @@ def process_file():
         tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
         # Queue a job for the uploaded file with a backend/asr_worker.py worker
-        speechcatcher_queue.enqueue('backend.asr_worker.process_job', args=(full_filename, tmp_output_log_dir,
+        speechcatcher_queue.enqueue('asr_worker.process_job', args=(full_filename, tmp_output_log_dir,
                                                                             app.config['SPEECHENGINE'], 
                                                                             app.config['SPEECHENGINE_PARAMS'],
                                                                             app.config['CUDA_LD_LIBRARY_PATH'],
