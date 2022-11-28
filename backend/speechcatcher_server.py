@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.serving import WSGIRequestHandler
 
 import os
+import glob
 import tempfile
 
 from redis import Redis
@@ -68,7 +69,7 @@ def process_file():
 
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
-    return {'description':job.description, 'status':job.get_status, 'enqueued_at':job.enqueued_at,
+    return {'description':job.description, 'status':job.get_status(), 'enqueued_at':job.enqueued_at,
             'started_at':job.started_at, 'ended_at':job.ended_at}
 
 # List the status of all running, queued and expired jobs as json
