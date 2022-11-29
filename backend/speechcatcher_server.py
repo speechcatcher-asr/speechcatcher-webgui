@@ -40,16 +40,16 @@ def process_file():
     #if len(request.files) == 0:
     if 'my_file' not in request.files:
         print('Warning: No file part')
-        return 'error: no file part' #redirect(request.url)
+        return '<p>Error: no file part</p>'
     
     # TODO: allow multiple files
     file = request.files['my_file']
     print(f'{file=}')
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
-    #if file.filename == '':
-    #    print('Warning: No selected file')
-    #    return 'error: no selected file' #redirect(request.url)
+    if file.filename == '':
+        print('Warning: No selected file')
+        return '<p>Error: no selected file</p>'
     # Note: might make sense to implement filter for extensions?
     if file:
         filename = secure_filename(file.filename)
@@ -59,13 +59,15 @@ def process_file():
 
         # Queue a job for the uploaded file with a backend/asr_worker.py worker
         # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
-        speechcatcher_queue.enqueue('asr_worker.process_job', timeout=360000, args=(full_filename, tmp_output_log_dir,
+        speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename, tmp_output_log_dir,
                                                                             app.config['SPEECHENGINE'], 
                                                                             app.config['SPEECHENGINE_PARAMS'],
                                                                             app.config['CUDA_LD_LIBRARY_PATH'],
                                                                             app.config['CUDA_WRAPPER']), description=filename)
 
         return '<p>File uploaded.</p>'
+    else:
+        return '<p>Error: no file object</p>'
 
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
