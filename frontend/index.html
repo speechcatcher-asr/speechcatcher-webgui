@@ -73,7 +73,7 @@
 
                 <form id="upload_form" name="form" action="apiv1/process" method="POST" enctype="multipart/form-data" >
                     <div id="upload_form_div">
-                        <input name="my_files" id="my_file" size="27" type="file" />
+                        <input name="my_file" id="my_file" size="27" type="file" />
                         <!--button class="btn btn-sm btn-outline-secondary">Browse</button-->
                         <input class="btn btn-sm btn-outline-secondary" type="button" name="action" value="Upload" onclick="redirect();"/>
                         <iframe id='my_iframe' name='my_iframe' src="">
@@ -84,6 +84,18 @@
               </div>
             </div>
           </div>
+          <script id="jobs-template" type="text/x-dot-template">
+          <div id='job_view'>
+            <b><span data-feather="users"></span> Running jobs </b>
+            {{~it.running: value}}
+            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
+            {{~}}
+            <b><span data-feather="users"></span> Queued jobs </b>
+            {{~it.queued: value}}
+            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
+            {{~}}
+          </div>
+          </script>
         </main>
       </div>
     </div>
@@ -102,6 +114,8 @@
       feather.replace()
     </script>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="js/doT.min.js"></script>
     <script src="js/speechcatcher.js"></script>
   </body>
 </html>
