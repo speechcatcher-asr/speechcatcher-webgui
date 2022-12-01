@@ -6,8 +6,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.serving import WSGIRequestHandler
 
 import os
+import sys
 import glob
 import tempfile
+import yaml
+import traceback
 
 from redis import Redis
 from rq import Queue
@@ -20,21 +23,29 @@ registry = StartedJobRegistry('default', connection=redis_conn)
 
 # Todo: yaml config for everything below, or as additional params to argparse
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['CUDA_WRAPPER'] = '' #'CUDA_VISIBLE_DEVICES=0'
-app.config['CUDA_LD_LIBRARY_PATH'] = '' #'LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib/'
-app.config['SPEECHENGINE'] = 'whisper'
-app.config['SPEECHENGINE_PARAMS'] = '--model small'
+
+yaml_config = None
 
 # only for development
 app.secret_key = 'secretkey'
 
-# Upload a media file to app.config['UPLOAD_FOLDER']
+def load_config(config_filename='config.yaml'):
+    with open(config_filename, "r") as stream:
+        try:
+            return yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+            traceback.print_exc()
+            sys.exit(-3)
+
+api_prefix = ''
+
+# Upload a media file to yaml_config['upload_folder']
 # adapted from the example in the flask documentation: https://flask.palletsprojects.com/en/2.2.x/patterns/fileuploads/
 # test with curl, e.g.:
 # curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@Sachunterricht.mp4" http://localhost:5000/process
-@app.route('/process', methods=['POST'])
+@app.route(api_prefix+'/process', methods=['POST'])
 def process_file():
     # check if the post request has the file part
     if 'my_file' not in request.files:
@@ -52,7 +63,7 @@ def process_file():
     # Note: might make sense to implement filter for extensions?
     if file:
         filename = secure_filename(file.filename)
-        full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        full_filename = os.path.join(yaml_config['upload_folder'], filename)
         file.save(full_filename)
         tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
@@ -60,10 +71,10 @@ def process_file():
         # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
         speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename,
                                                                             tmp_output_log_dir,
-                                                                            app.config['SPEECHENGINE'], 
-                                                                            app.config['SPEECHENGINE_PARAMS'],
-                                                                            app.config['CUDA_LD_LIBRARY_PATH'],
-                                                                            app.config['CUDA_WRAPPER']),
+                                                                            yaml_config['speechengine'], 
+                                                                            yaml_config['speechengine_params'],
+                                                                            yaml_config['cuda_ld_library_path'],
+                                                                            yaml_config['cuda_wrapper']),
                                                                             description=filename)
 
         return '<p>File uploaded.</p>'
@@ -76,7 +87,7 @@ def get_job_status_dict(job):
             'started_at':job.started_at, 'ended_at':job.ended_at}
 
 # List the status of all running, queued and expired jobs as json
-@app.route('/status', methods=['GET'])
+@app.route(api_prefix+'/status', methods=['GET'])
 def status():
     running_job_ids = registry.get_job_ids() 
     expired_job_ids = registry.get_expired_job_ids() 
@@ -96,10 +107,10 @@ def status():
 
 # List available and finished transcriptions that the user can download
 # We let the speechengine write to all formats (srt, txt, vtt), but only search with *.vtt
-@app.route('/list_outputs', methods=['GET'])
+@app.route(api_prefix+'/list_outputs', methods=['GET'])
 def list_outputs():
-    folder_len = len(app.config['UPLOAD_FOLDER'])
-    vtts = glob.glob(app.config['UPLOAD_FOLDER'] + '*.vtt')
+    folder_len = len(yaml_config['output_folder'])
+    vtts = glob.glob(yaml_config['output_folder'] + '*.vtt')
     base_filenames = [myfile[folder_len:-4] for myfile in vtts]
     return jsonify(base_filenames)
 
@@ -118,7 +129,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ensure_dir(app.config['UPLOAD_FOLDER'])
+    yaml_config = load_config(config_filename='config.yaml')
+
+    ensure_dir(yaml_config['upload_folder'])
+    ensure_dir(yaml_config['output_folder'])
 
     if args.debug:
         app.debug = True
