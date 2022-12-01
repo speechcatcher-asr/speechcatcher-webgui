@@ -37,7 +37,6 @@ app.secret_key = 'secretkey'
 @app.route('/process', methods=['POST'])
 def process_file():
     # check if the post request has the file part
-    #if len(request.files) == 0:
     if 'my_file' not in request.files:
         print('Warning: No file part')
         return '<p>Error: no file part</p>'
@@ -59,11 +58,13 @@ def process_file():
 
         # Queue a job for the uploaded file with a backend/asr_worker.py worker
         # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
-        speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename, tmp_output_log_dir,
+        speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename,
+                                                                            tmp_output_log_dir,
                                                                             app.config['SPEECHENGINE'], 
                                                                             app.config['SPEECHENGINE_PARAMS'],
                                                                             app.config['CUDA_LD_LIBRARY_PATH'],
-                                                                            app.config['CUDA_WRAPPER']), description=filename)
+                                                                            app.config['CUDA_WRAPPER']),
+                                                                            description=filename)
 
         return '<p>File uploaded.</p>'
     else:
@@ -94,7 +95,7 @@ def status():
                      'queued': queued_job_dicts})
 
 # List available and finished transcriptions that the user can download
-# We let the speechengine write to all formats (srt, txt, vtt)
+# We let the speechengine write to all formats (srt, txt, vtt), but only search with *.vtt
 @app.route('/list_outputs', methods=['GET'])
 def list_outputs():
     folder_len = len(app.config['UPLOAD_FOLDER'])
@@ -102,6 +103,7 @@ def list_outputs():
     base_filenames = [myfile[folder_len:-4] for myfile in vtts]
     return jsonify(base_filenames)
 
+#create directory if it doesnt exist
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
