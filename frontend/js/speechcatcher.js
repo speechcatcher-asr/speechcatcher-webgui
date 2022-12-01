@@ -2,7 +2,7 @@ var jobsTemplate = doT.template(document.getElementById('jobs-template').text);
 
 function updateStatus()
 {
-    $.get( "/status", function( data ) {
+    $.get( "/sc/apiv1/status", function( data ) {
         console.log(data);
         var jobs_view_data = $(jobsTemplate(data));
         console.log(jobs_view_data);
