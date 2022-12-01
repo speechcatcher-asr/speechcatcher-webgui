@@ -10,7 +10,7 @@ def process_job(filename, tmp_output_log_dir, speechengine='whisper', params='--
     if speechengine == 'whisper':
         engine_full_command = shutil.which('whisper')
 
-        job_command = f'{cuda_ld_library_path} {cuda_wrapper} {engine_full_command} {params} {filename}'
+        job_command = f'{cuda_ld_library_path} {cuda_wrapper} {engine_full_command} {params} {filename}'.strip()
 
         print('Starting job:', job_command)
         proc = subprocess.Popen(job_command,
