@@ -84,18 +84,40 @@
               </div>
             </div>
           </div>
-          <script id="jobs-template" type="text/x-dot-template">
           <div id='job_view'>
+          <script id="jobs-template" type="text/x-dot-template">
             <b><span data-feather="users"></span> Running jobs </b>
-            {{~it.running: value}}
-            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
-            {{~}}
+            {{? it.running.length }}
+                {{~it.running: value}}
+                <p>{{!value.description}} (started at: {{!value.started_at}})</p>
+                {{~}}
+            {{??}}
+                <p>None</p>
+            {{?}}
             <b><span data-feather="users"></span> Queued jobs </b>
-            {{~it.queued: value}}
-            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
-            {{~}}
-          </div>
+            {{? it.queued.length }}
+                {{~it.queued: value}}
+                <p>{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
+                {{~}}
+            {{??}}
+                <p>None</p>
+            {{?}}
           </script>
+          </div>
+          <div>
+            <h3 class="h3">Finished transcripts</h3>
+            <div id='download_view'>
+            <script id="downloads-template" type="text/x-dot-template">
+            <p>
+            {{~it: value}}
+                {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
+                <a href="download/{{!value}}.srt">(srt)</a>,
+                <a href="download/{{!value}}.txt">(txt)</a>
+            {{~}}
+            </p>
+            </script>
+            </div>
+          </div>
         </main>
       </div>
     </div>
