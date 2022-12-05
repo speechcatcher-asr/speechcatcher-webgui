@@ -1,5 +1,7 @@
 window.onload = function(){
     updateStatus(true);
+    updateDownloads(true);
+    feather.replace();
 };
 
 var jobsTemplate = doT.template(document.getElementById('jobs-template').text);

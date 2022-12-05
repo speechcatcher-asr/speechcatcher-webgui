@@ -18,7 +18,7 @@
 
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Speechcatcher</a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"><img src="speechcatcher.svg">Speechcatcher</a>
       <!--input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"-->
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
@@ -27,98 +27,70 @@
       </ul>
     </nav>
 
-    <div class="container-fluid">
+    <div class="container">
       <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link active" href="#">
-                  <span data-feather="home"></span>
-                  Dashboard
-                </a>
-              </li>
-             
-              
-             <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="users"></span>
-                  Queued jobs
-                </a>
-             </li>
-            
-             <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="users"></span>
-                  Running jobs
-                </a>
-             </li>
-
-             <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file"></span>
-                  Finished jobs
-                </a>
-             </li>
-              
-            </ul>
-          </div>
-        </nav>
-
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Upload</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
-
-                <form id="upload_form" name="form" action="sc/apiv1/process" method="POST" enctype="multipart/form-data" >
-                    <div id="upload_form_div">
-                        <input name="my_file" id="my_file" size="27" type="file" />
-                        <!--button class="btn btn-sm btn-outline-secondary">Browse</button-->
-                        <input class="btn btn-sm btn-outline-secondary" type="button" name="action" value="Upload" onclick="redirect();"/>
-                        <iframe id='my_iframe' name='my_iframe' src="">
-                        </iframe>
-                    </div>    
-                </form>
-
+          <main role="main" class="col-md-10 ml-sm-auto pt-3 px-4 border-bottom">
+              <div>
+                <h1 class="h2">Upload</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                  <div class="btn-group mr-2">
+                    <form id="upload_form" name="form" action="sc/apiv1/process" method="POST" enctype="multipart/form-data" >
+                        <div id="upload_form_div">
+                            <input name="my_file" id="my_file" size="27" type="file" />
+                            <!--button class="btn btn-sm btn-outline-secondary">Browse</button-->
+                            <input class="btn btn-sm btn-outline-secondary" type="button" name="action" value="Upload" onclick="redirect();"/>
+                            <iframe width="200" height="50" id='my_iframe' name='my_iframe' src="">
+                            </iframe>
+                        </div>    
+                    </form>
+                  </div>
+                </div>
               </div>
-            </div>
+           </main>
+       </div>
+       <br/>
+       <div class="row">
+           <div class="col-md-10 ml-sm-auto border-bottom">
+              <h1 class="h2">Jobs</h1>
+                  <div id='job_view'>    
+                      <script id="jobs-template" type="text/x-dot-template">
+                        <b><span data-feather="users"></span> Running jobs </b>
+                        {{? it.running.length }}
+                            {{~it.running: value}}
+                            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
+                            {{~}}
+                        {{??}}
+                            <p>None</p>
+                        {{?}}
+                        <b><span data-feather="users"></span> Queued jobs </b>
+                        {{? it.queued.length }}
+                            {{~it.queued: value}}
+                            <p>{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
+                            {{~}}
+                        {{??}}
+                            <p>None</p>
+                        {{?}}
+                      </script>
+                  </div>
+           </div>
+           <br/>
+       </div>
+          <div class="row">
+             <div class="col-md-10 ml-sm-auto">
+                <h3 class="h3">Finished transcripts</h3>
+                <div id='download_view' class="col-md-10 ml-sm-auto">
+                    <script id="downloads-template" type="text/x-dot-template">
+                    <p>
+                    {{~it: value}}
+                        {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
+                        <a href="download/{{!value}}.srt">(srt)</a>,
+                        <a href="download/{{!value}}.txt">(txt)</a>
+                    {{~}}
+                    </p>
+                    </script>
+                </div>
+             </div>
           </div>
-          <div id='job_view'>
-          <script id="jobs-template" type="text/x-dot-template">
-            <b><span data-feather="users"></span> Running jobs </b>
-            {{? it.running.length }}
-                {{~it.running: value}}
-                <p>{{!value.description}} (started at: {{!value.started_at}})</p>
-                {{~}}
-            {{??}}
-                <p>None</p>
-            {{?}}
-            <b><span data-feather="users"></span> Queued jobs </b>
-            {{? it.queued.length }}
-                {{~it.queued: value}}
-                <p>{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
-                {{~}}
-            {{??}}
-                <p>None</p>
-            {{?}}
-          </script>
-          </div>
-          <div>
-            <h3 class="h3">Finished transcripts</h3>
-            <div id='download_view'>
-            <script id="downloads-template" type="text/x-dot-template">
-            <p>
-            {{~it: value}}
-                {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
-                <a href="download/{{!value}}.srt">(srt)</a>,
-                <a href="download/{{!value}}.txt">(txt)</a>
-            {{~}}
-            </p>
-            </script>
-            </div>
-          </div>
-        </main>
       </div>
     </div>
 
