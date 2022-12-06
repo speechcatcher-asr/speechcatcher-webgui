@@ -12,6 +12,9 @@ import tempfile
 import yaml
 import traceback
 
+from io import BytesIO
+from zipfile import ZipFile
+
 from redis import Redis
 from rq import Queue
 from rq.registry import StartedJobRegistry
@@ -113,6 +116,22 @@ def list_outputs():
     vtts = glob.glob(yaml_config['output_folder'] + '*.vtt')
     base_filenames = [myfile[folder_len:-4] for myfile in vtts]
     return jsonify(base_filenames)
+
+@app.route(api_prefix+'/zip_files/<file_format>')
+def zip_files(file_format):
+
+    assert(file_format in ["vtt", "srt", "txt"])
+    
+    buffer = BytesIO()
+
+    # Open a ZipFile object in memory and add all files with <file_format> in output_folder
+    with ZipFile(buffer, 'w') as zip_file:
+        for filename in os.listdir(yaml_config['output_folder']):
+            if filename.endswith('.'+file_format):
+                zip_file.write(yaml_config['output_folder']+filename)
+
+    buffer.seek(0)
+    return send_file(buffer, download_name=f'{file_format}_files.zip', as_attachment=True)
 
 #create directory if it doesnt exist
 def ensure_dir(f):
