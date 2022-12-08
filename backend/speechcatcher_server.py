@@ -87,7 +87,9 @@ def process_file():
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
     return {'description':job.description, 'status':job.get_status(), 'enqueued_at':job.enqueued_at,
-            'started_at':job.started_at, 'ended_at':job.ended_at}
+            'started_at':job.started_at, 'ended_at':job.ended_at, 
+            'progress_percent':job.meta['progress_percent'] if 'progress_percent' in job.meta else 0.0,
+            'progress_status':job.meta['progress_status'] if 'progress_status' in job.meta else 'Loading job...'}
 
 # List the status of all running, queued and expired jobs as json
 @app.route(api_prefix+'/status', methods=['GET'])
