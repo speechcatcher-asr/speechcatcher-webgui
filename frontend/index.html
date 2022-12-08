@@ -78,15 +78,19 @@
           <div class="row">
              <div class="col-md-10 ml-sm-auto">
                 <h3 class="h3">Finished transcripts</h3>
+                <p>Download a zip-file of all transcripts: <a href="sc/apiv1/zip_files/vtt">(vtts)</a>
+                                        <a href="sc/apiv1/zip_files/srt">(srts)</a>
+                                        <a href="sc/apiv1/zip_files/txt">(txts)</a></p>
+
                 <div id='download_view' class="col-md-10 ml-sm-auto">
                     <script id="downloads-template" type="text/x-dot-template">
-                    <p>
                     {{~it: value}}
+                    <p>
                         {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
                         <a href="download/{{!value}}.srt">(srt)</a>,
                         <a href="download/{{!value}}.txt">(txt)</a>
-                    {{~}}
                     </p>
+                    {{~}}
                     </script>
                 </div>
              </div>
