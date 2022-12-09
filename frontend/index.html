@@ -29,7 +29,7 @@
 
     <div class="container">
       <div class="row">
-          <main role="main" class="col-md-10 ml-sm-auto pt-3 px-4 border-bottom">
+          <main role="main" class="col-md-10 ml-sm-auto py-3 border-bottom">
               <div>
                 <h1 class="h2">Upload</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
@@ -48,16 +48,20 @@
               </div>
            </main>
        </div>
-       <br/>
+       
        <div class="row">
-           <div class="col-md-10 ml-sm-auto border-bottom">
+           <div class="col-md-10 ml-sm-auto border-bottom py-3">
               <h1 class="h2">Jobs</h1>
                   <div id='job_view'>    
                       <script id="jobs-template" type="text/x-dot-template">
                         <b><span data-feather="users"></span> Running jobs </b>
                         {{? it.running.length }}
                             {{~it.running: value}}
-                            <p>{{!value.description}} (started at: {{!value.started_at}})</p>
+                            <p class="py-1 my-0">{{!value.description}} (started at: {{!value.started_at}})</p>
+                            <svg width="500" height="20">
+                                <rect width="500" height="15" style="fill:grey"></rect>
+                                <rect width="{{!value.progress_percent*5.0}}" height="15" style="fill:green"></rect>
+                            </svg> {{!value.progress_percent.toFixed(1)}}% status: {{!value.progress_status}}<br/>
                             {{~}}
                         {{??}}
                             <p>None</p>
@@ -65,7 +69,7 @@
                         <b><span data-feather="users"></span> Queued jobs </b>
                         {{? it.queued.length }}
                             {{~it.queued: value}}
-                            <p>{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
+                            <p class="py-1 my-0">{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
                             {{~}}
                         {{??}}
                             <p>None</p>
@@ -76,16 +80,16 @@
            <br/>
        </div>
           <div class="row">
-             <div class="col-md-10 ml-sm-auto">
+             <div class="col-md-10 ml-sm-auto py-3">
                 <h3 class="h3">Finished transcripts</h3>
-                <p>Download a zip-file of all transcripts: <a href="sc/apiv1/zip_files/vtt">(vtts)</a>
-                                        <a href="sc/apiv1/zip_files/srt">(srts)</a>
+                <p>Download a zip-file of all transcripts: <a href="sc/apiv1/zip_files/vtt">(vtts)</a>,
+                                        <a href="sc/apiv1/zip_files/srt">(srts)</a>,
                                         <a href="sc/apiv1/zip_files/txt">(txts)</a></p>
 
-                <div id='download_view' class="col-md-10 ml-sm-auto">
+                <div id='download_view' class="col-md-10">
                     <script id="downloads-template" type="text/x-dot-template">
                     {{~it: value}}
-                    <p>
+                    <p class="py-1 my-0">
                         {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
                         <a href="download/{{!value}}.srt">(srt)</a>,
                         <a href="download/{{!value}}.txt">(txt)</a>
@@ -101,8 +105,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="node_modules/@popperjs/core/lib/popper.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
@@ -112,7 +115,6 @@
       feather.replace()
     </script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="js/doT.min.js"></script>
     <script src="js/speechcatcher.js"></script>
   </body>
