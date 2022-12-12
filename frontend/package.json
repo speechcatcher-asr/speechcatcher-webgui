@@ -30,7 +30,6 @@
     "@popperjs/core": "^2.11.6",
     "@tabler/icons": "^1.116.1",
     "bootstrap": "^5.2.2",
-    "dot": "^2.0.0-beta.1",
-    "feather": "0.0.6"
+    "dot": "^2.0.0-beta.1"
   }
 }
