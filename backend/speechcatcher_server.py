@@ -44,10 +44,27 @@ def load_config(config_filename='config.yaml'):
 
 api_prefix = ''
 
+# enqueue an ASR job on the redis job queue
+def enqueue_asr_job(full_filename):
+    tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
+    # Queue a job for the uploaded file with a backend/asr_worker.py worker
+    # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
+    return speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename,
+                                                                            tmp_output_log_dir,
+                                                                            yaml_config['speechengine'],
+                                                                            yaml_config['speechengine_params'],
+                                                                            yaml_config['cuda_ld_library_path'],
+                                                                            yaml_config['cuda_wrapper']),
+                                                                            description=filename)
+
+# enqueue a download job on the redis job queue
+def enqueue_download_job(url):
+    return speechcatcher_queue.enqueue('asr_worker.download_video', job_timeout=360000, args=(url))
+
 # Upload a media file to yaml_config['upload_folder']
 # adapted from the example in the flask documentation: https://flask.palletsprojects.com/en/2.2.x/patterns/fileuploads/
 # test with curl, e.g.:
-# curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@Sachunterricht.mp4" http://localhost:5000/process
+# curl -i -X POST -H "Content-Type: multipart/form-data" -F "my_file=@Sachunterricht.mp4" http://localhost:5000/process
 @app.route(api_prefix+'/process', methods=['POST'])
 def process_file():
     # check if the post request has the file part
@@ -70,19 +87,17 @@ def process_file():
         file.save(full_filename)
         tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
-        # Queue a job for the uploaded file with a backend/asr_worker.py worker
-        # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
-        speechcatcher_queue.enqueue('asr_worker.process_job', job_timeout=360000, args=(full_filename,
-                                                                            tmp_output_log_dir,
-                                                                            yaml_config['speechengine'], 
-                                                                            yaml_config['speechengine_params'],
-                                                                            yaml_config['cuda_ld_library_path'],
-                                                                            yaml_config['cuda_wrapper']),
-                                                                            description=filename)
+        enqueue_asr_job(full_filename)
 
         return '<p>File uploaded.</p>'
     else:
         return '<p>Error: no file object</p>'
+
+# process url to a video
+@app.route(api_prefix+'/process_url', methods=['POST'])
+def process_url():
+    url = request.form['url']
+    enqueue_download_job(url)    
 
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
@@ -110,6 +125,11 @@ def status():
     return jsonify({'running': running_job_dicts, 'expired': expired_job_dicts,
                      'queued': queued_job_dicts})
 
+# Todo: cancel job endpoint
+@app.route(api_prefix+'/cancel_job/<job_id>', methods=['GET'])
+def cancel_job(job_id):
+    return None
+
 # List available and finished transcriptions that the user can download
 # We let the speechengine write to all formats (srt, txt, vtt), but only search with *.vtt
 @app.route(api_prefix+'/list_outputs', methods=['GET'])
@@ -135,7 +155,7 @@ def zip_files(file_format):
     buffer.seek(0)
     return send_file(buffer, download_name=f'{file_format}_files.zip', as_attachment=True)
 
-#create directory if it doesnt exist
+# Create directory if it doesnt exist
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
