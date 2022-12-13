@@ -45,7 +45,7 @@ def load_config(config_filename='config.yaml'):
 api_prefix = ''
 
 # enqueue an ASR job on the redis job queue
-def enqueue_asr_job(full_filename):
+def enqueue_asr_job(filename, full_filename):
     tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
     # Queue a job for the uploaded file with a backend/asr_worker.py worker
     # Note: the default timeout is only 180 seconds in redis queue, we increase it to 100 hours.
@@ -59,7 +59,7 @@ def enqueue_asr_job(full_filename):
 
 # enqueue a download job on the redis job queue
 def enqueue_download_job(url):
-    return speechcatcher_queue.enqueue('asr_worker.download_video', job_timeout=360000, args=(url))
+    return speechcatcher_queue.enqueue('asr_worker.download_video', job_timeout=360000, args=(url,), description=url)
 
 # Upload a media file to yaml_config['upload_folder']
 # adapted from the example in the flask documentation: https://flask.palletsprojects.com/en/2.2.x/patterns/fileuploads/
@@ -87,7 +87,7 @@ def process_file():
         file.save(full_filename)
         tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
-        enqueue_asr_job(full_filename)
+        enqueue_asr_job(filename, full_filename)
 
         return '<p>File uploaded.</p>'
     else:
@@ -96,8 +96,10 @@ def process_file():
 # process url to a video
 @app.route(api_prefix+'/process_url', methods=['POST'])
 def process_url():
+    print('request form: ', request.form)
     url = request.form['url']
     enqueue_download_job(url)    
+    return '<p>Download job started.</p>'
 
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
