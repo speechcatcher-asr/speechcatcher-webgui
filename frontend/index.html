@@ -11,7 +11,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="css/jquery.notice.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="dashboard.css" rel="stylesheet">
   </head>
@@ -22,14 +22,14 @@
       <!--input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"-->
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#">Sign out</a>
+          <!--a class="nav-link" href="#">Sign out</a-->
         </li>
       </ul>
     </nav>
 
     <div class="container">
       <div class="row">
-          <main role="main" class="col-md-10 ml-sm-auto py-3 border-bottom">
+          <main role="main" class="col-md-10 ml-sm-auto py-3">
               <div>
                 <h1 class="h2">Upload <img src="/node_modules/@tabler/icons/icons/file-upload.svg"/></h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
@@ -38,23 +38,43 @@
                         <div id="upload_form_div">
                             <input name="my_file" id="my_file" size="27" type="file" />
                             <!--button class="btn btn-sm btn-outline-secondary">Browse</button-->
-                            <input class="btn btn-sm btn-outline-secondary" type="button" name="action" value="Upload" onclick="redirect();"/>
+                            <input class="btn btn-primary" type="button" name="action" value="Upload" onclick="redirect();"/>
                             <iframe width="200" height="50" id='my_iframe' name='my_iframe' src="">
                             </iframe>
                         </div>    
                     </form>
                   </div>
                 </div>
+                
               </div>
            </main>
        </div>
-       
-       <div class="row">
-           <div class="col-md-10 ml-sm-auto border-bottom py-3">
+      
+       <form id="upload_url_form" method="POST" action="sc/apiv1/process_url">
+          <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="url">or transcribe media file from URL:</label>
+                </div>
+            </div>
+
+            <div class="row border-bottom py-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="url" name="url"/>
+                </div>
+                <div class="col-md-2 px-1">
+                    <button type="submit" class="btn btn-outline-secondary">Download and <img src="/node_modules/@tabler/icons/icons/file-import.svg"/></button>
+                </div>
+            </div>
+          </div>
+       </form> 
+
+       <div class="row border-bottom">
+           <div class="col-md-10 ml-sm-auto py-3">
               <h1 class="h2">Jobs <img src="/node_modules/@tabler/icons/icons/file-import.svg"/></h1>
                   <div id='job_view'>    
                       <script id="jobs-template" type="text/x-dot-template">
-                        <b><span data-feather="users"></span> Running jobs </b>
+                        <b>Running jobs </b>
                         {{? it.running.length }}
                             {{~it.running: value}}
                             <p class="py-1 my-0">{{!value.description}} (started at: {{!value.started_at}})</p>
@@ -66,7 +86,7 @@
                         {{??}}
                             <p>None</p>
                         {{?}}
-                        <b><span data-feather="users"></span> Queued jobs </b>
+                        <b>Queued jobs </b>
                         {{? it.queued.length }}
                             {{~it.queued: value}}
                             <p class="py-1 my-0">{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
@@ -109,6 +129,7 @@
     <script src="node_modules/@popperjs/core/lib/popper.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
+    <script src="js/jquery.notice.js"></script>
     <script src="js/doT.min.js"></script>
     <script src="js/speechcatcher.js"></script>
   </body>
