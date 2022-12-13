@@ -1,7 +1,6 @@
 window.onload = function(){
     updateStatus(true);
     updateDownloads(true);
-    feather.replace();
 };
 
 var jobsTemplate = doT.template(document.getElementById('jobs-template').text);
@@ -34,6 +33,29 @@ function updateDownloads(recursive = false)
         setInterval(updateDownloads, 20000);
     }
 }
+
+// https://stackoverflow.com/questions/25983603/how-to-submit-an-html-form-without-redirection
+function urlFormSubmit(event) {
+  var url = "sc/apiv1/process_url";
+  var request = new XMLHttpRequest();
+  request.open('POST', url, true);
+  request.onload = function() { // request successful
+  // we can use server response to our request now
+    console.log(request.responseText);
+    jQuery.noticeAdd({text: 'Added new download job.', stay: false});
+  };
+
+  request.onerror = function() {
+    // request failed
+    jQuery.noticeAdd({text: 'Error in adding new download job.', stay: false});
+  };
+
+  request.send(new FormData(event.target)); // create FormData from form that triggered event
+  event.preventDefault();
+  setInterval(updateStatus, 3000);
+}
+
+document.getElementById('upload_url_form').addEventListener("submit", urlFormSubmit);
 
 // https://stackoverflow.com/questions/33732655/html-file-upload-why-use-iframe
 function redirect()
