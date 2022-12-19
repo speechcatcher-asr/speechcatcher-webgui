@@ -19,6 +19,7 @@ from redis import Redis
 from rq import Queue
 from rq.registry import StartedJobRegistry
 from rq.job import Job
+from rq.command import send_stop_job_command
 
 redis_conn = Redis()
 speechcatcher_queue = Queue(connection=redis_conn)
@@ -103,7 +104,7 @@ def process_url():
 
 # Helper function to extract the most important information about a job that is displayed to the user
 def get_job_status_dict(job):
-    return {'description':job.description, 'status':job.get_status(), 'enqueued_at':job.enqueued_at,
+    return {'jobid': job.id,'description':job.description, 'status':job.get_status(), 'enqueued_at':job.enqueued_at,
             'started_at':job.started_at, 'ended_at':job.ended_at, 
             'progress_percent':job.meta['progress_percent'] if 'progress_percent' in job.meta else 0.0,
             'progress_status':job.meta['progress_status'] if 'progress_status' in job.meta else 'Loading job...'}
@@ -127,10 +128,18 @@ def status():
     return jsonify({'running': running_job_dicts, 'expired': expired_job_dicts,
                      'queued': queued_job_dicts})
 
-# Todo: cancel job endpoint
+# Cancel job endpoint
 @app.route(api_prefix+'/cancel_job/<job_id>', methods=['GET'])
 def cancel_job(job_id):
-    return None
+    job = Job.fetch(job_id, connection=redis_conn)
+    job.cancel()
+    return 'ok'
+
+# Kill a running job (cancelling is only valid for queued jobs)
+@app.route(api_prefix+'/kill_job/<job_id>', methods=['GET'])
+def kill_job(job_id):
+    send_stop_job_command(redis_conn, job_id)
+    return 'ok'
 
 # List available and finished transcriptions that the user can download
 # We let the speechengine write to all formats (srt, txt, vtt), but only search with *.vtt
