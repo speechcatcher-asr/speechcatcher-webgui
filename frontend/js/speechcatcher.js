@@ -55,6 +55,29 @@ function urlFormSubmit(event) {
   setInterval(updateStatus, 3000);
 }
 
+/*cancels either a queued job or a running job, if kill is set to true*/
+function cancelAsrJob(job_id, kill=false) {
+  console.log((kill ? "kill job" : "cancel job") + job_id);  
+ 
+  var endpoint = '';
+  if (kill) { 
+     endpoint = `/sc/apiv1/kill_job/${job_id}`;
+  } else {
+     endpoint = `/sc/apiv1/cancel_job/${job_id}`;
+  }
+
+  fetch(endpoint, {method: 'GET',}).then(data => {
+    jQuery.noticeAdd({text: 'Job '+job_id+' cancelled', stay: false});
+  }).catch(error => {
+    console.error(error);
+    jQuery.noticeAdd({text: 'Error in cancelling job: ' + job_id + '. Error:' + error, stay: false});
+  });
+
+  setInterval(updateStatus, 3000);
+
+  return false;
+}
+
 document.getElementById('upload_url_form').addEventListener("submit", urlFormSubmit);
 
 // https://stackoverflow.com/questions/33732655/html-file-upload-why-use-iframe

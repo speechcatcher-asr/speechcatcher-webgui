@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -81,7 +81,8 @@
                             <svg width="500" height="20">
                                 <rect width="500" height="15" style="fill:grey"></rect>
                                 <rect width="{{!value.progress_percent*5.0}}" height="15" style="fill:green"></rect>
-                            </svg> {{!value.progress_percent.toFixed(1)}}% status: {{!value.progress_status}}<br/>
+                            </svg> {{!value.progress_percent.toFixed(1)}}% status: {{!value.progress_status}}
+                            <a href="#" onmousedown="return cancelAsrJob('{{!value.jobid}}', true)"><img src="/node_modules/@tabler/icons/icons/circle-x.svg"> cancel</a><br/>
                             {{~}}
                         {{??}}
                             <p>None</p>
@@ -89,7 +90,7 @@
                         <b>Queued jobs </b>
                         {{? it.queued.length }}
                             {{~it.queued: value}}
-                            <p class="py-1 my-0">{{!value.description}} (enqueued at: {{!value.enqueued_at}})</p>
+                            <p class="py-1 my-0">{{!value.description}} (enqueued at: {{!value.enqueued_at}}) <a href="#" onmousedown="return cancelAsrJob('{{!value.jobid}}', false)"><img src="/node_modules/@tabler/icons/icons/circle-x.svg"> cancel</a></p>
                             {{~}}
                         {{??}}
                             <p>None</p>
@@ -126,7 +127,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-    <script src="node_modules/@popperjs/core/lib/popper.js"></script>
+    <!--script src="node_modules/@popperjs/core/lib/popper.js"></script-->
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <script src="js/jquery.notice.js"></script>
