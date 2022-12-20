@@ -1,10 +1,16 @@
 import subprocess
 import shutil
+import os
 import requests
 import re
 from rq import get_current_job
 
 from yt_dlp import YoutubeDL
+
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
 # inspired by https://stackoverflow.com/questions/31024968/using-ffmpeg-to-obtain-video-durations-in-python
 def get_duration(input_video):
@@ -30,8 +36,12 @@ def download_video(url, api_url='http://localhost/sc/apiv1/'):
         filename = ydl.prepare_filename(info)
         print('Downloaded file:', filename)
 
-        response = requests.post(url,params={'filename':filename})
-        r = requests.get(api_url + 'transcribe')
+        ensure_dir('downloads/')
+        dest_filename = 'downloads/' + filename 
+        shutil.move(filename, dest_filename)
+
+        response = requests.post(url, params={'filename':filename, 'full_filename':dest_filename})
+        r = requests.get(api_url + 'process_local')
 
         return filename
 
@@ -84,7 +94,7 @@ def process_job(filename, tmp_output_log_dir, speechengine='whisper', params='--
         myjob.meta['progress_status'] = 'Loading model...'
         myjob.save_meta()
 
-        proc = subprocess.Popen(job_command, stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(job_command, bufsize=1, stdout=subprocess.PIPE, shell=True)
 
         try:
             logfile = tmp_output_log_dir + '/' + 'output.log'

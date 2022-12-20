@@ -62,6 +62,22 @@ def enqueue_asr_job(filename, full_filename):
 def enqueue_download_job(url):
     return speechcatcher_queue.enqueue('asr_worker.download_video', job_timeout=360000, args=(url,), description=url)
 
+# process a local file on the queue
+@app.route(api_prefix+'/process_local', methods=['POST'])
+def process_local_file():
+    if 'filename' not in request.values:
+        return 'filename parameter is missing'
+
+    if 'full_filename' not in request.values:
+        return 'full_filename parameter is missing'
+
+    filename = request.values['filename']
+    full_filename = request.values['full_filename']
+    
+    enqueue_asr_job(filename, full_filename)
+
+    return 'ok'
+
 # Upload a media file to yaml_config['upload_folder']
 # adapted from the example in the flask documentation: https://flask.palletsprojects.com/en/2.2.x/patterns/fileuploads/
 # test with curl, e.g.:
@@ -86,7 +102,6 @@ def process_file():
         filename = secure_filename(file.filename)
         full_filename = os.path.join(yaml_config['upload_folder'], filename)
         file.save(full_filename)
-        tmp_output_log_dir = tempfile.mkdtemp(prefix='speechcatcher_')
 
         enqueue_asr_job(filename, full_filename)
 
