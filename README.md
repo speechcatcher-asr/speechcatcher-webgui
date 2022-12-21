@@ -63,3 +63,21 @@ You can now restart the nginx server:
 ```
 sudo service restart nginx
 ```
+
+# Starting the backend
+
+When you start the backend server make sure that you are in the correct virtual environment and in the backend directory:
+
+```
+source backend_env/bin/activate
+cd backend
+python3 python3 speechcatcher_server.py
+```
+
+in a new screen or window, start the rqworker service:
+
+```
+rqworker
+```
+
+```
