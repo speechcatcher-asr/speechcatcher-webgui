@@ -71,7 +71,7 @@ When you start the backend server make sure that you are in the correct virtual 
 ```
 source backend_env/bin/activate
 cd backend
-python3 python3 speechcatcher_server.py
+python3 speechcatcher_server.py
 ```
 
 in a new screen or window, start the rqworker service:
