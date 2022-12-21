@@ -37,11 +37,13 @@ def download_video(url, api_url='http://localhost/sc/apiv1/'):
         print('Downloaded file:', filename)
 
         ensure_dir('downloads/')
+        old_filename = str(filename)
+        
+        filename = filename.replace(' ','_').replace('!', '').replace('?', '')
         dest_filename = 'downloads/' + filename 
-        shutil.move(filename, dest_filename)
+        shutil.move(old_filename, dest_filename)
 
-        response = requests.post(url, params={'filename':filename, 'full_filename':dest_filename})
-        r = requests.get(api_url + 'process_local')
+        response = requests.post(api_url + 'process_local', params={'filename':filename, 'full_filename':dest_filename})
 
         return filename
 
