@@ -80,4 +80,10 @@ in a new screen or window, start the rqworker service:
 rqworker
 ```
 
+On newer versions of Mac OS X you might need to do: 
+
 ```
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES rqworker
+```
+
+So that rqworker doesn't crash on trying to fork.
