@@ -54,6 +54,7 @@ def enqueue_asr_job(filename, full_filename):
                                                                             tmp_output_log_dir,
                                                                             yaml_config['speechengine'],
                                                                             yaml_config['speechengine_params'],
+                                                                            yaml_config['speechengine_path'],
                                                                             yaml_config['cuda_ld_library_path'],
                                                                             yaml_config['cuda_wrapper']),
                                                                             description=filename)
