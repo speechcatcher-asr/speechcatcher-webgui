@@ -46,13 +46,13 @@ In a typical debian/ubuntu based distrbution you can install nginx with:
 sudo apt-get install nginx
 ``` 
 
-Then you can copy the 
+Then you can copy the sample config file.
 
 ```
 cp speechcatcher_nginx_sample.conf /etc/nginx/sites-available/speechcatcher.conf
 ```
 
-make some changes to /etc/nginx/sites-available/speechcatcher.conf, at the very least configure the root directory to match your frontend installation. Then make a link:
+make some changes to /etc/nginx/sites-available/speechcatcher.conf, **at the very least configure the root directory to match your frontend installation**. Then make a link:
 
 ```
 ln -s /etc/nginx/sites-available/speechcatcher.conf /etc/nginx/sites-enabled/speechcatcher.conf
@@ -63,3 +63,31 @@ You can now restart the nginx server:
 ```
 sudo service restart nginx
 ```
+
+# Starting the backend
+
+When you start the backend server make sure that you are in the correct virtual environment and in the backend directory:
+
+```
+source backend_env/bin/activate
+cd backend
+python3 speechcatcher_server.py
+```
+
+in a new screen or window, start the rqworker service:
+
+```
+rqworker
+```
+
+On newer versions of Mac OS X you might need to do: 
+
+```
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES rqworker
+```
+
+So that rqworker doesn't crash on trying to fork.
+
+# That's it!
+
+You should now be able to see and use the webgui on http://localhost/
