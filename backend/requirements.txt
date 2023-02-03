@@ -1,3 +1,6 @@
 flask
 rq
 redis
+yt-dlp
+sentencepiece
+transformers
