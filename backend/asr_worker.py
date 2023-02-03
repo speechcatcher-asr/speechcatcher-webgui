@@ -7,17 +7,20 @@ from rq import get_current_job
 
 from yt_dlp import YoutubeDL
 
+# ensure the directory `f` exists
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
 
 # inspired by https://stackoverflow.com/questions/31024968/using-ffmpeg-to-obtain-video-durations-in-python
+# get the duration of any media file with ffprobe
 def get_duration(input_video):
     cmd = ['ffprobe', '-i', input_video, '-show_entries', 'format=duration', '-v', 'quiet', '-sexagesimal', '-of', 'csv=p=0']
     return subprocess.check_output(cmd).decode("utf-8").strip()
 
 # https://stackoverflow.com/questions/23727943/how-to-get-information-from-youtube-dl-in-python
+# This callback is used to update the download progress from yt_dlp in the job 
 def download_video_progress_hook(response):
     myjob = get_current_job()
     downloaded_percent = 0
@@ -27,7 +30,7 @@ def download_video_progress_hook(response):
     myjob.meta['progress_status'] = response['status']
     myjob.save_meta()
 
-# Downloads a video (or media file) with yt_dlp    
+# Downloads a media file from a video platform with yt_dlp    
 def download_video(url, api_url='http://localhost/sc/apiv1/'):
     ydl_opts = {'progress_hooks': [download_video_progress_hook]}
     with YoutubeDL(ydl_opts) as ydl:
