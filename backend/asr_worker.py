@@ -24,8 +24,11 @@ def get_duration(input_video):
 def download_video_progress_hook(response):
     myjob = get_current_job()
     downloaded_percent = 0
-    if response['total_bytes'] > 0:
-        downloaded_percent = (response['downloaded_bytes']*100.0)/response['total_bytes']
+    # some useful field in the yt-dlp response object:
+    # 'status', 'downloaded_bytes', 'fragment_index', 'fragment_count', 'filename', 'tmpfilename',
+    # 'max_progress', 'progress_idx', 'elapsed', 'total_bytes_estimate', 'eta', 'speed'
+    if 'total_bytes_estimate' in response and response['total_bytes_estimate'] > 0:
+        downloaded_percent = (response['downloaded_bytes']*100.0)/response['total_bytes_estimate']
     myjob.meta['progress_percent'] = downloaded_percent
     myjob.meta['progress_status'] = response['status']
     myjob.save_meta()
@@ -88,9 +91,35 @@ def process_job(filename, tmp_output_log_dir, speechengine='whisper', params='--
     myjob.meta['media_duration_seconds'] = media_duration_seconds
     myjob.save_meta()
 
-    if speechengine == 'whisper' or speechengine == 'whisper.cpp':
+    params = params if params is not None else ''
+    speechengine_path = speechengine_path if speechengine_path is not None else ''
+    cuda_ld_library_path = cuda_ld_library_path if cuda_ld_library_path is not None else ''
+    cuda_wrapper = cuda_wrapper if cuda_wrapper is not None else ''
 
+    if speechengine == 'speechcatcher':
+        engine_full_command = shutil.which('speechcatcher')
+        params = params if params is not None else ''
+        job_command = f'{engine_full_command} {params} {filename}'
+        print("job_command:", job_command)
 
+        myjob.meta['progress_status'] = 'Loading...'
+        myjob.save_meta()
+        proc = subprocess.Popen(job_command, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
+        myjob.meta['progress_status'] = 'Loading model...'
+        myjob.save_meta()
+
+        for line in iter(proc.stderr.readline, ""):
+            line_strs = str(line).split('\r')
+            for line_str in line_strs:
+                print(line_str)    
+                if 'Transcribing:' in line_str:
+                    myjob.meta['progress_status'] = 'Transcribing...'
+                    progress_percent = float(line_str.split()[1].split('%')[0].strip())
+                    progress_percent = min(progress_percent, 100.)
+                    myjob.meta['progress_percent'] = progress_percent            
+                    myjob.save_meta()
+
+    elif speechengine == 'whisper' or speechengine == 'whisper.cpp':
         if speechengine == 'whisper':
             engine_full_command = shutil.which('whisper')
             job_command = f'{cuda_ld_library_path} {cuda_wrapper} {engine_full_command} {params} {filename}'.strip()

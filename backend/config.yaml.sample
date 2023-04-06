@@ -2,5 +2,15 @@ upload_folder: uploads/
 output_folder: transcripts/
 cuda_wrapper: CUDA_VISIBLE_DEVICES=0
 cuda_ld_library_path: LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib/
-speechengine: whisper
-speechengine_params: --model small --output_dir transcripts/
+
+#speechengine: whisper
+#speechengine_params: --model small --output_dir transcripts/ --language de
+#speechengine_path:
+
+#speechengine: whisper.cpp
+#speechengine_params: -m {speechengine_path}/models/ggml-medium.bin -l de -f
+#speechengine_path: /Users/me/projects/whisper.cpp/
+
+speechengine: speechcatcher
+speechengine_params:
+speechengine_path: 
