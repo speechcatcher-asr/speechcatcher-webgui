@@ -42,12 +42,12 @@ function urlFormSubmit(event) {
   request.onload = function() { // request successful
   // we can use server response to our request now
     console.log(request.responseText);
-    jQuery.noticeAdd({text: 'Added new download job.', stay: false});
+    noticeAdd({text: 'Added new download job.', stay: false});
   };
 
   request.onerror = function() {
     // request failed
-    jQuery.noticeAdd({text: 'Error in adding new download job.', stay: false});
+    noticeAdd({text: 'Error in adding new download job.', stay: false});
   };
 
   request.send(new FormData(event.target)); // create FormData from form that triggered event
