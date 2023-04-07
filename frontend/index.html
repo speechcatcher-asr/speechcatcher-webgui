@@ -12,8 +12,7 @@
     <!-- Bootstrap core CSS -->
     <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery.notice.css" rel="stylesheet">
-    <!-- Custom styles for this template -->
-    <link href="dashboard.css" rel="stylesheet">
+    <link href="css/speechcatcher.css" rel="stylesheet">
   </head>
 
   <body>
@@ -37,8 +36,7 @@
                     <form id="upload_form" name="form" action="sc/apiv1/process" method="POST" enctype="multipart/form-data" >
                         <div id="upload_form_div">
                             <input name="my_file" id="my_file" size="27" type="file" />
-                            <!--button class="btn btn-sm btn-outline-secondary">Browse</button-->
-                            <input class="btn btn-primary" type="button" name="action" value="Upload" onclick="redirect();"/>
+                            <input class="btn btn-primary-green btn-green" type="button" name="action" value="Upload" onclick="redirect();"/>
                             <iframe width="200" height="50" id='my_iframe' name='my_iframe' src="">
                             </iframe>
                         </div>    
@@ -103,19 +101,26 @@
           <div class="row">
              <div class="col-md-10 ml-sm-auto py-3">
                 <h3 class="h3">Finished transcripts <img src="/node_modules/@tabler/icons/icons/file-text.svg"/></h3>
-                <p>Download a zip-file of all transcripts: <a href="sc/apiv1/zip_files/vtt">(vtts)</a>,
-                                        <a href="sc/apiv1/zip_files/srt">(srts)</a>,
-                                        <a href="sc/apiv1/zip_files/txt">(txts)</a></p>
+                <p>Download a zip-file of all transcripts: <a href="sc/apiv1/zip_files/vtt" class="text-success">(vtts)</a><span class="mx-1">|</span>
+                                        <a href="sc/apiv1/zip_files/srt" class="text-success">(srts)</a><span class="mx-1">|</span>
+                                        <a href="sc/apiv1/zip_files/txt" class="text-success">(txts)</a></p>
 
                 <div id='download_view' class="col-md-10">
                     <script id="downloads-template" type="text/x-dot-template">
-                    {{~it: value}}
-                    <p class="py-1 my-0">
-                        {{!value}} <a href="download/{{!value}}.vtt">(vtt)</a>,
-                        <a href="download/{{!value}}.srt">(srt)</a>,
-                        <a href="download/{{!value}}.txt">(txt)</a>
-                    </p>
-                    {{~}}
+                        <ul class="list-unstyled speechcatcher-downloads">
+                            {{~it:value}}
+                            <li class="my-1">
+                                <div class="d-flex flex-row align-items-center">
+                                    <div class="flex-grow-1">{{!value}}</div>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <div class="mr-2"><a href="download/{{!value}}.vtt" class="text-success">vtt</a></div><span class="mx-2">|</span>
+                                        <div class="mr-2"><a href="download/{{!value}}.srt" class="text-success">srt</a></div><span class="mx-2">|</span>
+                                        <div><a href="download/{{!value}}.txt" class="text-success">txt</a></div>
+                                    </div>
+                                </div>
+                            </li>
+                            {{~}}
+                        </ul>
                     </script>
                 </div>
              </div>
