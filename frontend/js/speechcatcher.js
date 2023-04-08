@@ -8,12 +8,14 @@ var downloadsTemplate = doT.template(document.getElementById('downloads-template
 
 function updateStatus(recursive = false)
 {
-    $.get( "/sc/apiv1/status", function( data ) {
+    fetch('/sc/apiv1/status')
+      .then(response => response.json())
+      .then(data => {
         console.log(data);
-        var jobs_view_html = $(jobsTemplate(data));
-        $('#job_view').empty();
-        $('#job_view').append(jobs_view_html);
-    });
+        const jobsViewHtml = jobsTemplate(data);
+        const jobView = document.getElementById('job_view');
+        jobView.innerHTML = jobsViewHtml;
+      });
 
     if (recursive) {
         setInterval(updateStatus, 20000);
@@ -22,12 +24,14 @@ function updateStatus(recursive = false)
 
 function updateDownloads(recursive = false)
 {
-    $.get( "/sc/apiv1/list_outputs", function( data ) {
+    fetch('/sc/apiv1/list_outputs')
+      .then(response => response.json())
+      .then(data => {
         console.log(downloadsTemplate(data));
-        var download_html = $(downloadsTemplate(data));
-        $('#download_view').empty();
-        $('#download_view').append(download_html); 
-    });
+        const download_html = downloadsTemplate(data);
+        const download_view = document.getElementById('download_view');
+        download_view.innerHTML = download_html;
+      });
 
     if (recursive) {
         setInterval(updateDownloads, 20000);
@@ -67,10 +71,10 @@ function cancelAsrJob(job_id, kill=false) {
   }
 
   fetch(endpoint, {method: 'GET',}).then(data => {
-    jQuery.noticeAdd({text: 'Job '+job_id+' cancelled', stay: false});
+    noticeAdd({text: 'Job '+job_id+' cancelled', stay: false});
   }).catch(error => {
     console.error(error);
-    jQuery.noticeAdd({text: 'Error in cancelling job: ' + job_id + '. Error:' + error, stay: false});
+    noticeAdd({text: 'Error in cancelling job: ' + job_id + '. Error:' + error, stay: false});
   });
 
   setInterval(updateStatus, 3000);
