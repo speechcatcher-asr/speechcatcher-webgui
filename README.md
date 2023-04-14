@@ -1,6 +1,8 @@
 # Speechcatcher-webgui
 
-Speechcatcher-webgui is a web based GUI for automatic transcription and subtitling engines. With it we plan to make speech recognition models like <a href="https://github.com/speechcatcher-asr/speechcatcher">speechcatcher (GPU/CPU)</a> or <a href="https://github.com/openai/whisper">whisper (GPU)</a> accessible to a wider audience. 
+Speechcatcher-webgui is a web based GUI for automatic transcription and subtitling engines. It supports speech recognition models like <a href="https://github.com/speechcatcher-asr/speechcatcher">speechcatcher (CPU)</a> and <a href="https://github.com/openai/whisper">whisper (GPU)</a>.
+
+![Speechcatcher screenshot](https://github.com/speechcatcher-asr/speechcatcher-webgui/raw/main/screenshot1.png)
 
 ## Installation
 
