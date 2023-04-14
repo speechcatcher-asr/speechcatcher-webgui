@@ -1,6 +1,6 @@
 {
   "name": "speechcatcher-webgui",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A webgui for video and audio transcription",
   "main": "js/speechcatcher.js",
   "scripts": {
@@ -26,6 +26,10 @@
     "url": "https://github.com/speechcatcher-asr/speechcatcher-webgui/issues"
   },
   "homepage": "https://github.com/speechcatcher-asr/speechcatcher-webgui#readme",
+  "scripts": {
+    "build": "npm run copy-dependencies",
+    "copy-dependencies": "mkdir -p dist && cp -r node_modules/@tabler/icons/icons dist/; cp node_modules/bootstrap/dist/js/bootstrap.min.js js/; cp node_modules/bootstrap/dist/css/* css/"
+  },
   "dependencies": {
     "@popperjs/core": "^2.11.6",
     "@tabler/icons": "^1.116.1",
