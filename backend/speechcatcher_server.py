@@ -169,18 +169,23 @@ def list_outputs():
 @app.route(api_prefix+'/zip_files/<file_format>')
 def zip_files(file_format):
 
-    assert(file_format in ["vtt", "srt", "txt"])
+    assert(file_format in ["vtt", "srt", "txt", "json"])
     
     buffer = BytesIO()
 
+    atleast_one_file = False
     # Open a ZipFile object in memory and add all files with <file_format> in output_folder
     with ZipFile(buffer, 'w') as zip_file:
         for filename in os.listdir(yaml_config['output_folder']):
             if filename.endswith('.'+file_format):
+                atleast_one_file = True
                 zip_file.write(yaml_config['output_folder']+filename)
 
-    buffer.seek(0)
-    return send_file(buffer, download_name=f'{file_format}_files.zip', as_attachment=True)
+    if not atleast_one_file:
+        jsonify({'error', 'no' + file_format + ' available for zip file generation.' })
+    else:
+        buffer.seek(0)
+        return send_file(buffer, download_name=f'{file_format}_files.zip', as_attachment=True)
 
 # Create directory if it doesnt exist
 def ensure_dir(f):
